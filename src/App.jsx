@@ -1,4 +1,5 @@
 import { BrowserRouter } from "react-router-dom";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 import { About, Contact, Experience, Feedbacks, Hero, Navbar, Tech, Works, StarsCanvas } from "./components";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -22,6 +23,7 @@ const App = () => {
             <StarsCanvas />
           </div>
         </div>
+        <SpeedInsights />
       </BrowserRouter>
     </ErrorBoundary>
   );
