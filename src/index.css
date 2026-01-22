@@ -13,6 +13,25 @@
   color-scheme: dark;
 }
 
+/* Performance optimizations */
+canvas {
+  display: block;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improve rendering performance */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Optimize font loading */
+@font-face {
+  font-family: "Poppins";
+  font-display: swap;
+}
+
 .hash-span {
   margin-top: -100px;
   padding-bottom: 100px;

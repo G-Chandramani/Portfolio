@@ -38,14 +38,27 @@ const Ball = (props) => {
 };
 
 const BallCanvas = ({ icon }) => {
+  // Optimize for performance - use lower DPR on mobile
+  const isMobile = window.innerWidth <= 768;
+  const dpr = isMobile ? [1, 1.5] : [1, 2];
+
   return (
     <Canvas
       frameloop='demand'
-      dpr={[1, 2]}
-      gl={{ preserveDrawingBuffer: true }}
+      dpr={dpr}
+      gl={{ 
+        preserveDrawingBuffer: true,
+        antialias: !isMobile,
+        powerPreference: isMobile ? "low-power" : "default"
+      }}
+      performance={{ min: 0.5 }}
     >
       <Suspense fallback={<CanvasLoader />}>
-        <OrbitControls enableZoom={false} />
+        <OrbitControls 
+          enableZoom={false}
+          enableDamping={true}
+          dampingFactor={0.05}
+        />
         <Ball imgUrl={icon} />
       </Suspense>
 

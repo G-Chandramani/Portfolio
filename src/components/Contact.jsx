@@ -29,25 +29,67 @@ const Contact = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    // Validate form fields
+    if (!form.name.trim() || !form.email.trim() || !form.message.trim()) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    // Check if EmailJS environment variables are configured
+    const serviceId = import.meta.env.VITE_APP_EMAILJS_SERVICE_ID;
+    const templateId = import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID;
+    const publicKey = import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      if (import.meta.env.DEV) {
+        console.error("EmailJS configuration missing. Please check your .env file.");
+      }
+      alert("Email service is not configured. Please contact the website administrator.");
+      return;
+    }
+
     setLoading(true);
+
+    // Get current date/time for the email template
+    const currentTime = new Date().toLocaleString('en-US', {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZoneName: 'short'
+    });
 
     emailjs
       .send(
-        import.meta.env.VITE_APP_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_APP_EMAILJS_TEMPLATE_ID,
+        serviceId,
+        templateId,
         {
-          from_name: form.name,
-          to_name: "Chandramani Gajbhare",
-          from_email: form.email,
-          to_email: "gajbharechandramani@gmail.com",
-          message: form.message,
+          name: form.name.trim(),
+          message: form.message.trim(),
+          time: currentTime,
+          // Additional variables for reply functionality
+          from_email: form.email.trim(),
+          reply_to: form.email.trim(),
         },
-        import.meta.env.VITE_APP_EMAILJS_PUBLIC_KEY
+        publicKey
       )
       .then(
-        () => {
+        (response) => {
           setLoading(false);
-          alert("Thank you. I will get back to you as soon as possible.");
+          if (import.meta.env.DEV) {
+            console.log("Email sent successfully!", response.status, response.text);
+          }
+          alert("Thank you! I will get back to you as soon as possible.");
 
           setForm({
             name: "",
@@ -57,9 +99,26 @@ const Contact = () => {
         },
         (error) => {
           setLoading(false);
-          console.error(error);
-
-          alert("Ahh, something went wrong. Please try again.");
+          if (import.meta.env.DEV) {
+            console.error("EmailJS Error:", error);
+          }
+          
+          // Provide more specific error messages
+          let errorMessage = "Something went wrong. Please try again.";
+          
+          if (error.text) {
+            if (error.text.includes("Invalid template ID")) {
+              errorMessage = "Email template configuration error. Please contact support.";
+            } else if (error.text.includes("Invalid service ID")) {
+              errorMessage = "Email service configuration error. Please contact support.";
+            } else if (error.text.includes("Invalid public key")) {
+              errorMessage = "Email service authentication error. Please contact support.";
+            } else {
+              errorMessage = `Error: ${error.text}`;
+            }
+          }
+          
+          alert(errorMessage);
         }
       );
   };
