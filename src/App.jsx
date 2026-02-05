@@ -38,6 +38,7 @@ const App = () => {
           {/* Vercel Speed Insights */}
           <SpeedInsights />
         </div>
+        <SpeedInsights />
       </BrowserRouter>
     </ErrorBoundary>
   );
