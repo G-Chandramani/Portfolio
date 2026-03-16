@@ -3,17 +3,15 @@ import { motion } from "framer-motion";
 
 import { styles } from "../styles";
 import { ComputersCanvas } from "./canvas";
+import heroMobile from "../assets/hero-mobile.png";
 
 const Hero = () => {
   const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile only once to avoid re-mounting the 3D canvas
   useEffect(() => {
     const media = window.matchMedia("(max-width: 768px)");
     setIsMobile(media.matches);
-
-    const handler = (e) => setIsMobile(e.matches);
-    media.addEventListener("change", handler);
-    return () => media.removeEventListener("change", handler);
   }, []);
 
   return (
@@ -31,19 +29,25 @@ const Hero = () => {
             Hi, I'm <span className="text-[#915EFF]">Chandramani</span>
           </h1>
           <p className={`${styles.heroSubText} mt-2 text-white-100`}>
-            I develop Java backend solutions,{" "}
+            I develop Java backend solutions,
             <br className="sm:block hidden" />
             scalable applications and enterprise systems
           </p>
         </div>
       </div>
 
-      {/* 3D Canvas only on desktop */}
+      {/* Desktop: original 3D canvas (unchanged behavior) */}
       {!isMobile && <ComputersCanvas />}
 
-      {/* Mobile fallback background */}
+      {/* Mobile: static fallback image */}
       {isMobile && (
-        <div className="w-full h-full bg-hero-pattern bg-cover bg-center" />
+        <div className="w-full h-full flex items-center justify-center">
+          <img
+            src={heroMobile}
+            alt="3D Computer"
+            className="w-full h-full object-cover"
+          />
+        </div>
       )}
 
       <div className="absolute xs:bottom-10 bottom-32 w-full flex justify-center items-center">
